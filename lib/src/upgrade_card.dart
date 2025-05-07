@@ -153,9 +153,9 @@ class UpgradeCardState extends State<UpgradeCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(message),
-            Padding(
-                padding: const EdgeInsets.only(top: 15.0),
-                child: Text(appMessages.message(UpgraderMessage.prompt) ?? '')),
+            // Padding(
+            //     padding: const EdgeInsets.only(top: 15.0),
+            //     child: Text(appMessages.message(UpgraderMessage.prompt) ?? '')),
             if (notes != null) notes,
           ],
         ),
