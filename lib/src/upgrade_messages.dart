@@ -55,8 +55,7 @@ class UpgraderMessages {
   final String languageCode;
 
   /// Provide a [code] to override the system-reported default locale.
-  UpgraderMessages({String? code})
-      : languageCode = (code ?? findLanguageCode()) {
+  UpgraderMessages({String? code}) : languageCode = (code ?? findLanguageCode()) {
     assert(languageCode.isNotEmpty);
   }
 
@@ -244,8 +243,7 @@ class UpgraderMessages {
             'Đã có phiên bản mới của {{appName}}. Phiên bản {{currentAppStoreVersion}} đã sẵn sàng, bạn đang dùng {{currentInstalledVersion}}.';
         break;
       case 'zh':
-        message =
-            '{{appName}}有新的版本！您拥有{{currentInstalledVersion}}的版本可更新到{{currentAppStoreVersion}}的版本。';
+        message = '{{appName}}有新的版本！您拥有{{currentInstalledVersion}}的版本可更新到{{currentAppStoreVersion}}的版本。';
         break;
       case 'en':
       default:
