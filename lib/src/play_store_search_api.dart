@@ -280,7 +280,18 @@ extension PlayStoreResults on PlayStoreSearchAPI {
           storeVersionStartIndex, storeVersionEndIndex);
 
       // storeVersion might be: 'Varies with device', which is not a valid version.
-      version = Version.parse(storeVersion).toString();
+      // Validate before parsing to avoid FormatException
+      if (storeVersion.isNotEmpty && !storeVersion.contains('Varies with device')) {
+        try {
+          version = Version.parse(storeVersion).toString();
+        } catch (parseError) {
+          if (debugLogging) {
+            print('upgrader: PlayStoreResults.redesignedVersion parse error: $parseError, storeVersion: $storeVersion');
+          }
+        }
+      } else if (debugLogging) {
+        print('upgrader: PlayStoreResults.redesignedVersion invalid storeVersion: $storeVersion');
+      }
     } catch (e) {
       if (debugLogging) {
         print('upgrader: PlayStoreResults.redesignedVersion exception: $e');

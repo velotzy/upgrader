@@ -40,17 +40,11 @@ class MyUpgradeAlert extends UpgradeAlert {
 
 class MyUpgradeAlertState extends UpgradeAlertState {
   @override
-  Widget alertDialog(
-      Key? key,
-      String title,
-      String message,
-      String? releaseNotes,
-      BuildContext context,
-      bool cupertino,
-      UpgraderMessages messages) {
+  Widget alertDialog(Key? key, String title, String message, String? releaseNotes, BuildContext context,
+      bool cupertino, UpgraderMessages messages) {
     return Theme(
       data: ThemeData(
-        dialogTheme: const DialogTheme(
+        dialogTheme: const DialogThemeData(
           titleTextStyle: TextStyle(color: Colors.red, fontSize: 48),
           contentTextStyle: TextStyle(color: Colors.green, fontSize: 18),
         ),
@@ -61,8 +55,7 @@ class MyUpgradeAlertState extends UpgradeAlertState {
           ),
         ),
       ),
-      child: super.alertDialog(
-          key, title, message, releaseNotes, context, cupertino, messages),
+      child: super.alertDialog(key, title, message, releaseNotes, context, cupertino, messages),
     );
   }
 }
