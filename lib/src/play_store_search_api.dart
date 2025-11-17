@@ -283,7 +283,7 @@ extension PlayStoreResults on PlayStoreSearchAPI {
       // Validate before parsing to avoid FormatException
       if (storeVersion.isNotEmpty && !storeVersion.contains('Varies with device')) {
         try {
-      version = Version.parse(storeVersion).toString();
+          version = Version.parse(storeVersion).toString();
         } catch (parseError) {
           if (debugLogging) {
             print('upgrader: PlayStoreResults.redesignedVersion parse error: $parseError, storeVersion: $storeVersion');
