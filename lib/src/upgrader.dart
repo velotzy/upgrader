@@ -366,17 +366,32 @@ class Upgrader with WidgetsBindingObserver {
       print('upgrader: installedVersion: ${state.packageInfo?.version}');
       print('upgrader: minAppVersion: ${state.minAppVersion}');
     }
-    if (versionInfo?.appStoreVersion == null ||
-        state.packageInfo?.version == null) {
-      if (state.debugLogging) print('upgrader: isUpdateAvailable: false');
+    
+    if (state.packageInfo?.version == null) {
+      if (state.debugLogging) print('upgrader: isUpdateAvailable: false (no installed version)');
       return false;
     }
 
     try {
       final installedVersion = Version.parse(state.packageInfo!.version);
+      Version? storeVersion = versionInfo?.appStoreVersion;
+      
+      // Fallback: If appStoreVersion is null but minAppVersion is available,
+      // use minAppVersion as the store version
+      if (storeVersion == null && versionInfo?.minAppVersion != null) {
+        storeVersion = versionInfo!.minAppVersion;
+        if (state.debugLogging) {
+          print('upgrader: using minAppVersion as fallback: $storeVersion');
+        }
+      }
+      
+      if (storeVersion == null) {
+        if (state.debugLogging) print('upgrader: isUpdateAvailable: false (no store version)');
+        return false;
+      }
 
-      final available = versionInfo!.appStoreVersion! > installedVersion;
-      _updateAvailable = available ? versionInfo?.appStoreVersion : null;
+      final available = storeVersion > installedVersion;
+      _updateAvailable = available ? storeVersion : null;
     } on Exception catch (e) {
       if (state.debugLogging) {
         print('upgrader: isUpdateAvailable: $e');
