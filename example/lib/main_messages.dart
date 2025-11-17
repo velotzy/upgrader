@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:version/version.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,12 +61,14 @@ class MyApp extends StatelessWidget {
         Locale('pt', ''), // Portuguese, no country code
         Locale('pl', ''), // Polish, no country code
         Locale('ps', ''), // Pashto, no country code
+        Locale('ro', ''), // Romanian, no country code
         Locale('ru', ''), // Russian, no country code
         Locale('sv', ''), // Swedish, no country code
         Locale('ta', ''), // Tamil, no country code
         Locale('te', ''), // Telugu, no country code
         Locale('tr', ''), // Turkish, no country code
         Locale('uk', ''), // Ukrainian, no country code
+        Locale('uz', ''), // Uzbek, no country code
         Locale('vi', ''), // Vietnamese, no country code
         Locale('zh', ''), // Chinese, no country code
       ],
@@ -75,10 +78,11 @@ class MyApp extends StatelessWidget {
 
 class DemoApp extends StatelessWidget {
   static const appcastURL =
-      'https://raw.githubusercontent.com/larryaasen/upgrader/master/test/testappcast.xml';
+      'https://raw.githubusercontent.com/larryaasen/upgrader/main/test/testappcast.xml';
   final upgrader = Upgrader(
     storeController: UpgraderStoreController(
-        onAndroid: () => UpgraderAppcastStore(appcastURL: appcastURL)),
+        onAndroid: () => UpgraderAppcastStore(
+            appcastURL: appcastURL, osVersion: Version(0, 0, 0))),
     debugLogging: true,
     messages: MyUpgraderMessages(code: 'es'),
   );
@@ -159,12 +163,14 @@ class DemoLocalizationsDelegate
         'pt',
         'pl',
         'ps',
+        'ro',
         'ru',
         'sv',
         'ta',
         'te',
         'tr',
         'uk',
+        'uz',
         'vi',
         'zh'
       ].contains(locale.languageCode);

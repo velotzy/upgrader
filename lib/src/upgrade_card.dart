@@ -25,6 +25,7 @@ class UpgradeCard extends StatefulWidget {
     this.onLater,
     this.onUpdate,
     this.overflow = TextOverflow.ellipsis,
+    this.showPrompt = true,
     this.showIgnore = true,
     this.showLater = true,
     this.showReleaseNotes = true,
@@ -54,6 +55,9 @@ class UpgradeCard extends StatefulWidget {
 
   /// How visual overflow should be handled.
   final TextOverflow? overflow;
+
+  /// Hide or show Prompt label on dialog (default: true)
+  final bool showPrompt;
 
   /// Hide or show Ignore button on dialog (default: true)
   final bool showIgnore;
@@ -93,7 +97,8 @@ class UpgradeCardState extends State<UpgradeCard> {
             final upgraderState = snapshot.data!;
             if (upgraderState.versionInfo != null) {
               if (widget.upgrader.shouldDisplayUpgrade()) {
-                return buildUpgradeCard(context, const Key('upgrader_alert_card'));
+                return buildUpgradeCard(
+                    context, const Key('upgrader_alert_card'));
               } else {
                 if (widget.upgrader.state.debugLogging) {
                   print('upgrader: UpgradeCard will not display');
@@ -116,7 +121,8 @@ class UpgradeCardState extends State<UpgradeCard> {
       print('upgrader: UpgradeCard: will display');
       print('upgrader: UpgradeCard: showDialog title: $title');
       print('upgrader: UpgradeCard: showDialog message: $message');
-      print('upgrader: UpgradeCard: shouldDisplayReleaseNotes: $shouldDisplayReleaseNotes');
+      print(
+          'upgrader: UpgradeCard: shouldDisplayReleaseNotes: $shouldDisplayReleaseNotes');
 
       print('upgrader: UpgradeCard: showDialog releaseNotes: $releaseNotes');
     }
@@ -151,9 +157,11 @@ class UpgradeCardState extends State<UpgradeCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(message),
-            // Padding(
-            //     padding: const EdgeInsets.only(top: 15.0),
-            //     child: Text(appMessages.message(UpgraderMessage.prompt) ?? '')),
+            if (widget.showPrompt)
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: Text(appMessages.message(UpgraderMessage.prompt) ?? ''),
+              ),
             if (notes != null) notes,
           ],
         ),
@@ -171,7 +179,8 @@ class UpgradeCardState extends State<UpgradeCard> {
     return <Widget>[
       if (showIgnore)
         TextButton(
-            child: Text(appMessages.message(UpgraderMessage.buttonTitleIgnore) ?? ''),
+            child: Text(
+                appMessages.message(UpgraderMessage.buttonTitleIgnore) ?? ''),
             onPressed: () {
               // Save the date/time as the last time alerted.
               widget.upgrader.saveLastAlerted();
@@ -181,7 +190,8 @@ class UpgradeCardState extends State<UpgradeCard> {
             }),
       if (showLater)
         TextButton(
-            child: Text(appMessages.message(UpgraderMessage.buttonTitleLater) ?? ''),
+            child: Text(
+                appMessages.message(UpgraderMessage.buttonTitleLater) ?? ''),
             onPressed: () {
               // Save the date/time as the last time alerted.
               widget.upgrader.saveLastAlerted();
@@ -190,7 +200,8 @@ class UpgradeCardState extends State<UpgradeCard> {
               forceRebuild();
             }),
       TextButton(
-          child: Text(appMessages.message(UpgraderMessage.buttonTitleUpdate) ?? ''),
+          child: Text(
+              appMessages.message(UpgraderMessage.buttonTitleUpdate) ?? ''),
           onPressed: () {
             // Save the date/time as the last time alerted.
             widget.upgrader.saveLastAlerted();
@@ -201,7 +212,8 @@ class UpgradeCardState extends State<UpgradeCard> {
   }
 
   bool get shouldDisplayReleaseNotes =>
-      widget.showReleaseNotes && (widget.upgrader.releaseNotes?.isNotEmpty ?? false);
+      widget.showReleaseNotes &&
+      (widget.upgrader.releaseNotes?.isNotEmpty ?? false);
 
   void onUserIgnored() {
     if (widget.upgrader.state.debugLogging) {

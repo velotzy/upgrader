@@ -1,6 +1,6 @@
 # Upgrader
 
-[![codecov](https://codecov.io/gh/larryaasen/upgrader/branch/master/graph/badge.svg)](https://app.codecov.io/gh/larryaasen/upgrader)
+[![codecov](https://codecov.io/gh/larryaasen/upgrader/branch/main/graph/badge.svg)](https://app.codecov.io/gh/larryaasen/upgrader)
 [![pub package](https://img.shields.io/pub/v/upgrader.svg)](https://pub.dartlang.org/packages/upgrader)
 [![GitHub Stars](https://img.shields.io/github/stars/larryaasen/upgrader.svg)](https://github.com/larryaasen/upgrader/stargazers)
 <a href="https://www.buymeacoffee.com/larryaasen">
@@ -112,12 +112,12 @@ For [appcast](#appcast)), the release notes are taken from the description field
 ## Customization
 
 The alert can be customized by changing the `DialogTheme` on the `MaterialApp`, or by overriding methods in the `UpgradeAlert` class. See these examples for more details:
-- [example/lib/main-alert-theme.dart](example/lib/main-alert-theme.dart)
-- [example/lib/main-custom-alert.dart](example/lib/main-custom-alert.dart)
+- [example/lib/main_alert_theme.dart](example/lib/main_alert_theme.dart)
+- [example/lib/main_custom_alert.dart](example/lib/main_custom_alert.dart)
 
 The card can be customized by changing the `CardTheme` on the `MaterialApp`, or by overriding methods in the `UpgradeCard` class. See these examples for more details:
-- [example/lib/main-card-theme.dart](example/lib/main-card-theme.dart)
-- [example/lib/main-custom-card.dart](example/lib/main-custom-card.dart)
+- [example/lib/main_card_theme.dart](example/lib/main_card_theme.dart)
+- [example/lib/main_custom_card.dart](example/lib/main_custom_card.dart)
 
 Here are the custom parameters for `UpgradeAlert`:
 
@@ -128,6 +128,7 @@ Here are the custom parameters for `UpgradeAlert`:
 * onLater: called when the later button is tapped, defaults to ```null```
 * onUpdate: called when the update button is tapped, defaults to ```null```
 * shouldPopScope: called to determine if the dialog blocks the current route from being popped, which defaults to ```null```
+* showPrompt: hide or show Prompt label on dialog, which defaults to ```true```
 * showIgnore: hide or show Ignore button, which defaults to ```true```
 * showLater: hide or show Later button, which defaults to ```true```
 * showReleaseNotes: hide or show release notes, which defaults to ```true```
@@ -140,6 +141,7 @@ Here are the custom parameters for `UpgradeCard`:
 * onLater: called when the later button is tapped, defaults to ```null```
 * onUpdate: called when the update button is tapped, defaults to ```null```
 * overflow: How visual overflow should be handled, defaults to ```null```
+* showPrompt: hide or show Prompt label on dialog, which defaults to ```true```
 * showIgnore: hide or show Ignore button, which defaults to ```true```
 * showLater: hide or show Later button, which defaults to ```true```
 * showReleaseNotes: hide or show release notes, which defaults to ```true```
@@ -178,7 +180,7 @@ different store. Here is an example of using an Appcast on iOS.
 final upgrader = Upgrader(
   storeController: UpgraderStoreController(
     onAndroid: () => UpgraderPlayStore(),
-    oniOS: () => UpgraderAppcastStore(appcastURL: appcastURL),
+    oniOS: () => UpgraderAppcastStore(appcastURL: appcastURL, osVersion: osVersion),
   ),
 );
 ```
@@ -227,7 +229,7 @@ description field.
 When using GoRouter (package go_router) with upgrader, you may need to provide
 a navigatorKey to the ```UpgradeAlert``` widget so that the correct route
 context is used. Below is part of the code you will need for this. Also,
-checkout the [example/lib/main-gorouter.dart](example/lib/main-gorouter.dart) example for a more complete example.
+check out the [example/lib/main_gorouter.dart](example/lib/main_gorouter.dart) example for a more complete example.
 
 ```dart
   @override
@@ -241,6 +243,31 @@ checkout the [example/lib/main-gorouter.dart](example/lib/main-gorouter.dart) ex
           child: child ?? Text('child'),
         );
       },
+    );
+  }
+```
+
+## Using CupertinoApp
+
+When an app is using ```CupertinoApp``` instead of `MaterialApp`, you can now use the `UpgradeAlert` widget
+without errors. Using the `UpgradeCard` widget does not work with `CupertinoApp` because it uses the material
+`Card` widget.
+
+Example:
+```dart
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoApp(
+      title: 'Upgrader Example',
+      home: CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text('Upgrader CupertinoApp Example'),
+        ),
+        child: UpgradeAlert(
+          dialogStyle: UpgradeDialogStyle.cupertino,
+          child: const Center(child: Text('Checking...')),
+        ),
+      ),
     );
   }
 ```
@@ -306,10 +333,10 @@ Flutter package, is used by `upgrader` to download app details from an appcast.
 This is an Appcast example for Android.
 ```dart
 static const appcastURL =
-    'https://raw.githubusercontent.com/larryaasen/upgrader/master/test/testappcast.xml';
+    'https://raw.githubusercontent.com/larryaasen/upgrader/main/test/testappcast.xml';
 final upgrader = Upgrader(
   storeController: UpgraderStoreController(
-    onAndroid: () => UpgraderAppcastStore(appcastURL: appcastURL),
+    onAndroid: () => UpgraderAppcastStore(appcastURL: appcastURL, osVersion: osVersion),
   ),
 );
 
@@ -346,7 +373,7 @@ Widget build(BuildContext context) {
 ### Appcast Class
 ```dart
 final appcast = Appcast();
-final items = await appcast.parseAppcastItemsFromUri('https://raw.githubusercontent.com/larryaasen/upgrader/master/test/testappcast.xml');
+final items = await appcast.parseAppcastItemsFromUri('https://raw.githubusercontent.com/larryaasen/upgrader/main/test/testappcast.xml');
 final bestItem = appcast.bestItem();
 ```
 
@@ -371,7 +398,7 @@ UpgradeAlert(Upgrader(messages: MyUpgraderMessages()));
 
 ## Language localization
 
-The strings displayed in `upgrader` are already localized in 35 languages. New languages will be
+The strings displayed in `upgrader` are already localized in 37 languages. New languages will be
 supported in the future with minor updates. It also supports right to left languages.
 
 Languages supported:
@@ -403,6 +430,7 @@ Languages supported:
 * Polish ('pl')
 * Pashto ('ps')
 * Portuguese ('pt')
+* Romanian ('ro')
 * Russian ('ru')
 * Spanish ('es')
 * Swedish ('sv')
@@ -410,8 +438,8 @@ Languages supported:
 * Telugu ('te')
 * Turkish ('tr')
 * Ukrainian ('uk')
+* Uzbek ('uz')
 * Vietnamese ('vi')
-
 
 The `upgrader` package can be supplied with additional languages in your code by extending the `UpgraderMessages` class
 to provide custom values.
@@ -471,18 +499,18 @@ be compliant with Semantic Versioning.
 
 ## Examples
 
-There are [plenty of examples](https://github.com/larryaasen/upgrader/tree/master/example/lib) that cover various different situations that may
+There are [plenty of examples](https://github.com/larryaasen/upgrader/tree/main/example/lib) that cover various different situations that may
 help you customize the `upgrader` experience for your app. Check these out.
 
 |  |  |  |
 | --- | --- | --- |
 | main.dart | main_alert_again.dart | main_alert_theme.dart |
 | main_appcast.dart | main_card.dart | main_card_theme.dart |
-| main_cupertino.dart | main_custom_alert.dart | main_custom_card.dart |
-| main_dialog_key.dart | main_driver.dart | main_gorouter.dart |
-| main_localized_rtl.dart | main_macos.dart | main_messages.dart |
-| main_min_app_version.dart | main_multiple.dart | main_stateful.dart |
-| main_subclass.dart |  |  |
+| main_card_updated.dart | main_cupertino.dart | main_cupertinoapp.dart |
+| main_custom_alert.dart | main_custom_card.dart | main_dialog_key.dart |
+| main_driver.dart | main_gorouter.dart | main_localized_rtl.dart |
+| main_macos.dart | main_messages.dart | main_min_app_version.dart |
+| main_multiple.dart | main_stateful.dart | main_subclass.dart |
 
 ## Tapping UPDATE NOW button issue on Android
 

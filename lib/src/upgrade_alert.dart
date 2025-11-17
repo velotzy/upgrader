@@ -26,6 +26,7 @@ class UpgradeAlert extends StatefulWidget {
     this.onLater,
     this.onUpdate,
     this.shouldPopScope,
+    this.showPrompt = true,
     this.showIgnore = true,
     this.showLater = true,
     this.showReleaseNotes = true,
@@ -58,6 +59,9 @@ class UpgradeAlert extends StatefulWidget {
 
   /// Called to determine if the dialog blocks the current route from being popped.
   final BoolCallback? shouldPopScope;
+
+  /// Hide or show Prompt label on dialog (default: true)
+  final bool showPrompt;
 
   /// Hide or show Ignore button on dialog (default: true)
   final bool showIgnore;
@@ -117,7 +121,8 @@ class UpgradeAlertState extends State<UpgradeAlert> {
             }
 
             if (!displayed) {
-              final checkContext = widget.navigatorKey != null && widget.navigatorKey!.currentContext != null
+              final checkContext = widget.navigatorKey != null &&
+                      widget.navigatorKey!.currentContext != null
                   ? widget.navigatorKey!.currentContext!
                   : context;
               checkVersion(context: checkContext);
@@ -146,7 +151,8 @@ class UpgradeAlertState extends State<UpgradeAlert> {
           context: context,
           title: appMessages.message(UpgraderMessage.title),
           message: widget.upgrader.body(appMessages),
-          releaseNotes: shouldDisplayReleaseNotes ? widget.upgrader.releaseNotes : null,
+          releaseNotes:
+              shouldDisplayReleaseNotes ? widget.upgrader.releaseNotes : null,
           barrierDismissible: widget.barrierDismissible,
           messages: appMessages,
         );
@@ -207,7 +213,8 @@ class UpgradeAlertState extends State<UpgradeAlert> {
   }
 
   bool get shouldDisplayReleaseNotes =>
-      widget.showReleaseNotes && (widget.upgrader.releaseNotes?.isNotEmpty ?? false);
+      widget.showReleaseNotes &&
+      (widget.upgrader.releaseNotes?.isNotEmpty ?? false);
 
   /// Show the alert dialog.
   void showTheDialog({
@@ -225,14 +232,21 @@ class UpgradeAlertState extends State<UpgradeAlert> {
       print('upgrader: showTheDialog releaseNotes: $releaseNotes');
     }
 
+    if (!context.mounted) {
+      if (widget.upgrader.state.debugLogging) {
+        print('upgrader: showTheDialog context not mounted - dialog not shown');
+      }
+      return;
+    }
+
     // Save the date/time as the last time alerted.
     widget.upgrader.saveLastAlerted();
 
-    showDialog(
-      barrierDismissible: barrierDismissible,
-      context: context,
-      builder: (BuildContext context) {
-        return PopScope(
+    // Detect if CupertinoApp is in the widget tree
+    final isCupertinoApp =
+        context.findAncestorWidgetOfExactType<CupertinoApp>() != null;
+
+    dialogBuilder(BuildContext context) => PopScope(
           canPop: onCanPop(),
           onPopInvokedWithResult: (didPop, result) {
             if (widget.upgrader.state.debugLogging) {
@@ -249,8 +263,20 @@ class UpgradeAlertState extends State<UpgradeAlert> {
             messages,
           ),
         );
-      },
-    );
+
+    if (isCupertinoApp) {
+      showCupertinoDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: dialogBuilder,
+      );
+    } else {
+      showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: dialogBuilder,
+      );
+    }
   }
 
   /// Determines if the dialog blocks the current route from being popped.
@@ -270,8 +296,14 @@ class UpgradeAlertState extends State<UpgradeAlert> {
     return false;
   }
 
-  Widget alertDialog(Key? key, String title, String message, String? releaseNotes, BuildContext context,
-      bool cupertino, UpgraderMessages messages) {
+  Widget alertDialog(
+      Key? key,
+      String title,
+      String message,
+      String? releaseNotes,
+      BuildContext context,
+      bool cupertino,
+      UpgraderMessages messages) {
     // If installed version is below minimum app version, or is a critical update,
     // disable ignore and later buttons.
     final isBlocked = widget.upgrader.blocked();
@@ -284,7 +316,9 @@ class UpgradeAlertState extends State<UpgradeAlert> {
           padding: const EdgeInsets.only(top: 15.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: cupertino ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+            crossAxisAlignment: cupertino
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
             children: <Widget>[
               Text(messages.message(UpgraderMessage.releaseNotes) ?? '',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -297,13 +331,16 @@ class UpgradeAlertState extends State<UpgradeAlert> {
         constraints: const BoxConstraints(maxHeight: 400),
         child: SingleChildScrollView(
             child: Column(
-          crossAxisAlignment: cupertino ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          crossAxisAlignment:
+              cupertino ? CrossAxisAlignment.center : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(message),
-            // Padding(
-            //     padding: const EdgeInsets.only(top: 15.0),
-            //     child: Text(messages.message(UpgraderMessage.prompt) ?? '')),
+            if (widget.showPrompt)
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: Text(messages.message(UpgraderMessage.prompt) ?? ''),
+              ),
             if (notes != null) notes,
           ],
         )));
@@ -334,8 +371,10 @@ class UpgradeAlertState extends State<UpgradeAlert> {
     ];
 
     return cupertino
-        ? CupertinoAlertDialog(key: key, title: textTitle, content: content, actions: actions)
-        : AlertDialog(key: key, title: textTitle, content: content, actions: actions);
+        ? CupertinoAlertDialog(
+            key: key, title: textTitle, content: content, actions: actions)
+        : AlertDialog(
+            key: key, title: textTitle, content: content, actions: actions);
   }
 
   Widget button({
