@@ -336,11 +336,11 @@ class UpgradeAlertState extends State<UpgradeAlert> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(message),
-            if (widget.showPrompt)
-              Padding(
-                padding: const EdgeInsets.only(top: 15.0),
-                child: Text(messages.message(UpgraderMessage.prompt) ?? ''),
-              ),
+            // if (widget.showPrompt)
+            //   Padding(
+            //     padding: const EdgeInsets.only(top: 15.0),
+            //     child: Text(messages.message(UpgraderMessage.prompt) ?? ''),
+            //   ),
             if (notes != null) notes,
           ],
         )));
